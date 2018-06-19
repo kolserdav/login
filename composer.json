@@ -1,0 +1,19 @@
+{
+    "name": "kolserdav/login",
+    "description": "Registration and login module",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "kolserdav",
+            "email": "serega12101983@gmail.com"
+        }
+    ],
+    "require": {
+        "kolserdav/dbconnect": "^2.0",
+        "kolserdav/router": "^0.2.1"
+    },
+    "autoload" : {
+      "psr-4" : {"Avir\\Login\\" : "src/"}
+    }
+}
