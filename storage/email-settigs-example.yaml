@@ -1,0 +1,10 @@
+verify: #require field (section) for the login module
+  set-from:
+    address : address from
+    name : name from
+  username : name email acount
+  password : password
+  charset : UTF-8
+  host : smtp host
+  smtpsecure : ssl
+  port : 465
