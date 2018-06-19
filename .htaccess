@@ -1,7 +1,0 @@
-RewriteEngine On
-AddCharset UTF-8 .html .php
-RewriteCond %{REQUEST_URI} !^.*\.(json|html|appcache|jpg|css|js|gif|png)$ [NC]
-RewriteRule .* index.php [L]
-
-
-
