@@ -6,16 +6,22 @@
  * Time: 23:23
  */
 
-namespace Avir\Login\Module;
+namespace Avir\Login\Controller;
 
 
 use Avir\Login\Settings\Config;
 
 class Login extends Config
 {
+    public function home()
+    {
+
+        include __DIR__.'/../../storage/example-register.html';
+    }
 
     public function register()
     {
+
         $this->db->dbCall('create_table_users');
 
         $email = $_POST['email'];
@@ -26,6 +32,8 @@ class Login extends Config
 
         $token = $_POST['token'];
 
+        $checkbox = $_POST['checkbox'];
+
         if ($email && $password && $password2) {
 
             if (!$token){
@@ -33,7 +41,7 @@ class Login extends Config
                 $code = 1;
 
                 echo json_encode([
-                    'exception' => $this->langData[$code],
+                    'response' => $this->langData[$code],
                     'result' => false,
                     'code' => $code
                 ]);
@@ -44,12 +52,12 @@ class Login extends Config
 
                 $row = $this->db->dbCall('search_email', [$email]);
 
-                if ($row->id) {
+                if ($row) {
 
                     $code = 2;
 
                     echo json_encode([
-                        'exception' => $this->langData[$code],
+                        'response' => $this->langData[$code],
                         'result' => false,
                         'code' => $code
                     ]);
@@ -60,24 +68,39 @@ class Login extends Config
 
                     if ($password === $password2) {
 
-                        $password = password_hash($password2, PASSWORD_DEFAULT, ['cost' => 12]);
+                        if ($checkbox !== 'on'){
 
-                        $this->db->dbCall('insert_into_users', [$email, $password, $token]);
+                            $code = 5;
 
-                        $code = 4;
+                            echo json_encode([
+                                'response' => $this->langData[$code],
+                                'result' => false,
+                                'code' => $code
+                            ]);
 
-                        echo json_encode([
-                            'exception' => $this->langData[$code],
-                            'result' => true,
-                            'code' => $code
-                        ]);
+                            exit();
+                        }
+                        else {
+
+                            $password = password_hash($password2, PASSWORD_DEFAULT, ['cost' => 12]);
+
+                            $this->db->dbCall('insert_into_users', [$email, $password, $token]);
+
+                            $code = 4;
+
+                            echo json_encode([
+                                'response' => $this->langData[$code],
+                                'result' => true,
+                                'code' => $code
+                            ]);
+                        }
                     }
                     else {
 
                         $code = 3;
 
                         echo json_encode([
-                            'exception' => $this->langData[$code],
+                            'response' => $this->langData[$code],
                             'result' => false,
                             'code' => $code
                         ]);

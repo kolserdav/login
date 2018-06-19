@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+<form action="/reg" method="post">
+    <fieldset>
+        <legend>Registration:</legend><br>
+        Email<br>
+        <input type="email" title="input email" autocomplete="email" name="email">
+        <br>
+        <br>
+        Password<br>
+        <input type="password" title="input password" autocomplete="new-password" name="newPassword">
+        <br>
+        <br>
+        Repeat password<br>
+        <input type="password" title="input password" autocomplete="new-password" name="newPassword2">
+        <br><br>
+        <div>
+            <input type="hidden" value="sdj" name="token">
+            <input type="checkbox" name="checkbox" title="I accept">
+             Accept terms of use
+        </div>
+        <br><br>
+        <div id="error"></div>
+        <input type="submit" title="Send" value="send">
+    </fieldset>
+</form>
+</body>
+</html>
