@@ -16,7 +16,11 @@ JSON.parse({
  
  `
  "kolserdav/dbconnect": "^2.0", #https://github.com/kolserdav/dbconnect  
+ `
+ `
  "kolserdav/router": "^0.2.1",  #https://github.com/kolserdav/router  
+ `
+ `  
  "phpmailer/phpmailer": "^6.0"	#https://github.com/phpmailer/phpmailer  
 `
 
