@@ -16,7 +16,7 @@ class Login extends Config
     public function home()
     {
 
-        include __DIR__.'/../../storage/example-register.html';
+        include __DIR__.'/../../storage/example-login.html';
     }
 
     public function register()
@@ -40,13 +40,7 @@ class Login extends Config
 
                 $code = 1;
 
-                echo json_encode([
-                    'response' => $this->langData[$code],
-                    'result' => false,
-                    'code' => $code
-                ]);
-
-                exit();
+               $this->sendResponse($email, false, $code);
             }
             else {
 
@@ -56,13 +50,7 @@ class Login extends Config
 
                     $code = 2;
 
-                    echo json_encode([
-                        'response' => $this->langData[$code],
-                        'result' => false,
-                        'code' => $code
-                    ]);
-
-                    exit();
+                    $this->sendResponse($email, false, $code);
                 }
                 else {
 
@@ -72,13 +60,7 @@ class Login extends Config
 
                             $code = 5;
 
-                            echo json_encode([
-                                'response' => $this->langData[$code],
-                                'result' => false,
-                                'code' => $code
-                            ]);
-
-                            exit();
+                            $this->sendResponse($email, false, $code);
                         }
                         else {
 
@@ -88,63 +70,74 @@ class Login extends Config
 
                             $code = 4;
 
-                            echo json_encode([
-                                'response' => $this->langData[$code],
-                                'result' => true,
-                                'code' => $code
-                            ]);
+                            $this->sendResponse($email, true, $code);
                         }
                     }
                     else {
 
                         $code = 3;
 
-                        echo json_encode([
-                            'response' => $this->langData[$code],
-                            'result' => false,
-                            'code' => $code
-                        ]);
-
-                        exit();
+                        $this->sendResponse($email, false, $code);
                     }
                 }
             }
         }
         else {
 
-            $this->errorData();
+            $code = 9;
+
+            $this->sendResponse($email, false, $code);
         }
     }
+
     public function login()
     {
+
         $email = $_POST['email'];
+
         $password = $_POST['currentPassword'];
+
         if ($email && $password) {
+
             $row = $this->db->dbCall('select_from_users', [$email]);
+
             if(!$row){
+
+                $code = 8;
+
                 echo json_encode([
-                    'exception' => "Адрес $email не зарегистрирован",
+                    'email' => $email,
+                    'response' => $email.' ' .$this->langData[$code],
+                    'code' => $code
                 ]);
+
                 exit();
             }
             else {
-                if (password_verify($password, $row->password)) {
-                    echo json_encode([
-                        'email' => $email,
-                        'exception' => 'Пароль верен',
-                    ]);
-                } else {
-                    echo json_encode([
-                        'email' => $email,
-                        'exception' => 'Неверный пароль',
-                    ]);
+
+                if (password_verify($password, $row['password'])) {
+
+                    $code = 7;
+
+                    $this->sendResponse($email, true, $code);
+
+                }
+                else {
+
+                    $code = 8;
+
+                    $this->sendResponse($email, false, $code);
                 }
             }
         }
         else {
-            $this->errorData();
+
+            $code = 9;
+
+            $this->sendResponse($email, false, $code);
         }
     }
+
     public function mainToken()
     {
         $email = $_POST['email'];
@@ -200,6 +193,7 @@ class Login extends Config
             ]);
         }
     }
+
     public function verifySendEmail()
     {
         $error = 'Неожиданный запрос';
@@ -255,11 +249,20 @@ class Login extends Config
         echo json_encode([
             'exception' => 'Что-то пошло не так',
         ]);
+
+        exit();
     }
-    public function errorData()
+
+    public function sendResponse($email, $bool, $code)
     {
+
         echo json_encode([
-            'exception' => 'Заполните все обязательные поля'
+            'email' => $email,
+            'response' => $this->langData[$code],
+            'result' => $bool,
+            'code' => $code
         ]);
+
+        exit();
     }
 }

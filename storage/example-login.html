@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+<form action="/login" method="post">
+    <fieldset>
+        <legend>Log in:</legend><br>
+        Email<br>
+        <input type="email" title="input email" autocomplete="email" name="email">
+        <br>
+        <br>
+        Password<br>
+        <input type="password" title="input password" autocomplete="new-password" name="currentPassword">
+        <br>
+        <br>
+        <div>
+            <input type="checkbox" name="checkbox" title="I accept">
+            Remember me
+        </div>
+        <br><br>
+        <div id="error"></div>
+        <input type="submit" title="Send" value="send">
+    </fieldset>
+</form>
+</body>
+</html>
