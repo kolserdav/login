@@ -7,3 +7,10 @@
 7 : Login is successfully
 8 : Password or email incorrect
 9 : Fill in all required fields
+10 : Confirm email
+11 : <h2> If you activated the registration process on the site, please click on the link below. </h2>
+12 : Confirmation of user registration
+13 : Email has been activated before
+14 : The activation email has been sent to the email address you provided. If the message does not arrive within 5 minutes, check the Spam folder.
+15 : Email confirmed
+16 : Unexpected query

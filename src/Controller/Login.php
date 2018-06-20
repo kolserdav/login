@@ -16,7 +16,7 @@ class Login extends Config
     public function home()
     {
 
-        include __DIR__.'/../../storage/example-login.html';
+        include __DIR__.'/../../storage/example-verify.html';
     }
 
     public function register()
@@ -138,7 +138,137 @@ class Login extends Config
         }
     }
 
-    public function mainToken()
+    public function verifyEmail()
+    {
+        $email = $_POST['email'];
+
+        $row = $this->db->dbCall('email_is_active', [$email]);
+
+        $isActive = $row->isactive;
+
+        if ($isActive === null){
+
+            $userCodeVerify = base64_encode($email);
+
+            $emailStr = base64_encode('email=');
+
+            $tokenStr = base64_encode('secret=');
+
+            $idStr = base64_encode('code=');
+
+            $tokenRaw = $this->db->dbCall('get_token', [$email]);
+
+            $token = $tokenRaw['token'];
+
+            $id = $tokenRaw['id'];
+
+            $meta = '<meta charset="UTF-8">';
+
+            $verifyUrl = "<a href= " . $this->protocol . $this->server . '/verify-send-to?' . $emailStr . $userCodeVerify . '!'
+                . $tokenStr . $token . '$' . $idStr . $id . ">".$this->langData[10]."</a>";
+
+            $message = $meta . $this->langData[11] . $verifyUrl;
+
+            $name = ($tokenRaw['name'])? $tokenRaw['name'] : $email;
+
+            $r = $this->sendEmail('verify',$this->langData[12], $name, $message, $email);
+
+            $this->sendResponse($email, true, 14);
+        }
+        else {
+
+            $this->sendResponse($email, false, 13);
+        }
+    }
+
+    public function verifySendEmail()
+    {
+
+        $str = preg_match('%\?.*%',$_SERVER['REQUEST_URI'], $m);
+
+        if ($str){
+
+            $fullStr = str_replace('?', '',$m[0]);
+
+            $str1 = preg_match('%.*!%', $fullStr, $m);
+
+            if($str1){
+
+                $emailStr = str_replace('!', '', $m[0]);
+
+                $str2 = preg_match('%!.*%', $fullStr, $m);
+
+                if ($str2) {
+
+                    $email = str_replace('email=', '', base64_decode($emailStr));
+
+                    $tokenStr = str_replace('!', '', $m[0]);
+
+                    preg_match('%.*\$%', str_replace(base64_encode('secret='), '', $tokenStr), $m);
+
+                    $token = str_replace('$', '', $m[0]);
+
+                    $str3 = preg_match('%\$.*%', $fullStr, $m);
+
+                    if($str3){
+
+                        $id = str_replace(['$', base64_encode('code=')], '', $m[0]);
+
+                        $raw = $this->db->dbCall('get_token', [$email]);
+
+                        if ($id == $raw['id'] && $token === $raw['token']){
+
+                            if ($this->db->dbCall('insert_isactive', [1, $email])){
+
+                                $this->sendResponse($email, true, 15);
+                            }
+                            else {
+
+                                $this->sendResponse($email, false, 16);
+                            }
+                        }
+                        else {
+
+                            $this->sendResponse($email, false, 16);
+                        }
+                    }
+                    else {
+
+                        $this->sendResponse($email, false, 16);
+                    }
+
+                }
+                else {
+
+                    $this->sendResponse(null, false, 16);
+                }
+            }
+            else {
+
+                $this->sendResponse(null, false, 16);
+            }
+        }
+        else {
+
+            $this->sendResponse(null, false, 16);
+        }
+    }
+
+    public function sendResponse($email, $bool, $code)
+    {
+
+        echo json_encode([
+            'email' => $email,
+            'response' => $this->langData[$code],
+            'result' => $bool,
+            'code' => $code
+        ]);
+
+        exit();
+    }
+
+    /*
+     *    public function mainToken()
     {
         $email = $_POST['email'];
         $tokenRaw = $this->db->dbCall('get_token', [$email]);
@@ -156,113 +286,5 @@ class Login extends Config
                 'token' => $token
             ]);
         }
-    }
-    public function verifyEmail()
-    {
-        $email = $_POST['email'];
-        $row = $this->db->dbCall('email_is_active', [$email]);
-        $isActive = $row->isactive;
-        if ($isActive === null){
-            if($_POST['please'] === 'active'){
-                echo json_encode([
-                    'response' => false
-                ]);
-            }
-            else {
-                $userCodeVerify = base64_encode($email);
-                $emailStr = base64_encode('email=');
-                $tokenStr = base64_encode('secret=');
-                $idStr = base64_encode('code=');
-                $tokenRaw = $this->db->dbCall('get_token', [$email]);
-                $token = $tokenRaw->token;
-                $id = $tokenRaw->id;
-                $meta = '<meta charset="UTF-8">';
-                $verifyUrl = "<a href= " . $this->protocol . '://' . $this->server . '/verify-send-to?' . $emailStr . $userCodeVerify . '!'
-                    . $tokenStr . $token . '$' . $idStr . $id . ">Подтвердить</a>";
-                $message = $meta . '<h2>Если вы активировали процерудуру регистрации на сайте, перейдите по ссылке ниже.</h2>' . $verifyUrl;
-                $name = ($tokenRaw->name)? $tokenRaw->name : $email;
-                $r = $this->sendEmail('verify','Подтверждение регистрации пользователя', $name, $message, $email);
-                echo json_encode([
-                    'email' => $token
-                ]);
-            }
-        }
-        else {
-            echo json_encode([
-                'response' => 'Email уже был активирован'
-            ]);
-        }
-    }
-
-    public function verifySendEmail()
-    {
-        $error = 'Неожиданный запрос';
-        $str = preg_match('%\?.*%',$_SERVER['REQUEST_URI'], $m);
-        if ($str){
-            $fullStr = str_replace('?', '',$m[0]);
-            $str1 = preg_match('%.*!%', $fullStr, $m);
-            if($str1){
-                $emailStr = str_replace('!', '', $m[0]);
-                $str2 = preg_match('%!.*%', $fullStr, $m);
-                if ($str2) {
-                    $email = str_replace('email=', '', base64_decode($emailStr));
-                    $tokenStr = str_replace('!', '', $m[0]);
-                    preg_match('%.*\$%', str_replace(base64_encode('secret='), '', $tokenStr), $m);
-                    $token = str_replace('$', '', $m[0]);
-                    $str3 = preg_match('%\$.*%', $fullStr, $m);
-                    if($str3){
-                        $id = str_replace(['$', base64_encode('code=')], '', $m[0]);
-                        $raw = $this->db->dbCall('get_token', [$email]);
-                        if ($id == $raw->id && $token === $raw->token){
-                            echo 'Email подтвержден';
-                            $this->db->dbCall('insert_isactive', [1, $email]);
-                        }
-                        else {
-                            echo $error;
-                            exit();
-                        }
-                    }
-                    else {
-                        echo $error;
-                        exit();
-                    }
-
-                }
-                else {
-                    echo $error;
-                    exit();
-                }
-            }
-            else {
-                echo $error;
-                exit();
-            }
-        }
-        else {
-            echo $error;
-            exit();
-        }
-    }
-
-    public function error()
-    {
-        echo json_encode([
-            'exception' => 'Что-то пошло не так',
-        ]);
-
-        exit();
-    }
-
-    public function sendResponse($email, $bool, $code)
-    {
-
-        echo json_encode([
-            'email' => $email,
-            'response' => $this->langData[$code],
-            'result' => $bool,
-            'code' => $code
-        ]);
-
-        exit();
-    }
+    }*/
 }
