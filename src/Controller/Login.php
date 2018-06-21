@@ -38,9 +38,7 @@ class Login extends Config
 
             if (!$token){
 
-                $code = 1;
-
-               $this->sendResponse($email, false, $code);
+               $this->sendResponse($email, false, 1);
             }
             else {
 
@@ -48,9 +46,7 @@ class Login extends Config
 
                 if ($row) {
 
-                    $code = 2;
-
-                    $this->sendResponse($email, false, $code);
+                    $this->sendResponse($email, false, 2);
                 }
                 else {
 
@@ -58,9 +54,7 @@ class Login extends Config
 
                         if ($checkbox !== 'on'){
 
-                            $code = 5;
-
-                            $this->sendResponse($email, false, $code);
+                            $this->sendResponse($email, false, 5);
                         }
                         else {
 
@@ -68,25 +62,19 @@ class Login extends Config
 
                             $this->db->dbCall('insert_into_users', [$email, $password, $token]);
 
-                            $code = 4;
-
-                            $this->sendResponse($email, true, $code);
+                            $this->sendResponse($email, true, 4);
                         }
                     }
                     else {
 
-                        $code = 3;
-
-                        $this->sendResponse($email, false, $code);
+                        $this->sendResponse($email, false, 3);
                     }
                 }
             }
         }
         else {
 
-            $code = 9;
-
-            $this->sendResponse($email, false, $code);
+            $this->sendResponse($email, false, 9);
         }
     }
 
@@ -117,24 +105,18 @@ class Login extends Config
 
                 if (password_verify($password, $row['password'])) {
 
-                    $code = 7;
-
-                    $this->sendResponse($email, true, $code);
+                    $this->sendResponse($email, true, 7);
 
                 }
                 else {
 
-                    $code = 8;
-
-                    $this->sendResponse($email, false, $code);
+                    $this->sendResponse($email, false, 8);
                 }
             }
         }
         else {
 
-            $code = 9;
-
-            $this->sendResponse($email, false, $code);
+            $this->sendResponse($email, false, 9);
         }
     }
 
@@ -171,7 +153,7 @@ class Login extends Config
 
             $name = ($tokenRaw['name'])? $tokenRaw['name'] : $email;
 
-            $r = $this->sendEmail('verify',$this->langData[12], $name, $message, $email);
+            $this->sendEmail('verify',$this->langData[12], $name, $message, $email);
 
             $this->sendResponse($email, true, 14);
         }
