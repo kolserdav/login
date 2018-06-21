@@ -16,7 +16,7 @@ class Login extends Config
     public function home()
     {
 
-        include __DIR__.'/../../storage/example-verify.html';
+        include __DIR__.'/../../storage/example-forgot.html';
     }
 
     public function register()
@@ -249,24 +249,29 @@ class Login extends Config
         exit();
     }
 
-    /*
-     *    public function mainToken()
+    public function forgotPass()
     {
-        $email = $_POST['email'];
-        $tokenRaw = $this->db->dbCall('get_token', [$email]);
-        $token = $tokenRaw->token;
-        echo json_encode([
-            'token' => $token
-        ]);
-    }
 
-    public function getToken()
-    {
-        if ($_POST['please'] === 'token') {
-            $token = hash('md5', uniqid('token', true));
+        $email = $_POST['email'];
+
+        $raw = $this->db->dbCall('get_token', [$email]);
+
+        if ($raw){
+
+            $url = $this->protocol.$this->server.'/'.base64_encode($raw['token']);
+
+            var_dump($url);
+        }
+        else {
+
+            $code = 6;
+
             echo json_encode([
-                'token' => $token
+                'email' => $email,
+                'response' => $email .' '.$this->langData[$code],
+                'result' => false,
+                'code' => $code
             ]);
         }
-    }*/
+    }
 }

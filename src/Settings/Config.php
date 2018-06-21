@@ -61,7 +61,8 @@ class Config
         $mail = new PHPMailer;
 
         $mail->isSMTP();
-        $mail->SMTPDebug = 2;
+
+        //$mail->SMTPDebug = 2;
 
         $mail->setFrom($this->emailSettings[$section]['set-from']['address'], $this->emailSettings[$section]['set-from']['name']);
 
