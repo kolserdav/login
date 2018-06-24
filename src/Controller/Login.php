@@ -260,7 +260,7 @@ class Login extends Config
 
             $url = $this->protocol.$this->server.'/'.base64_encode($raw['token']);
 
-            var_dump($url);
+            $this->sendEmail('forgot', $this->langData[17], 'uyem.ru', 's', '');
         }
         else {
 
